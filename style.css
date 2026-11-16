@@ -1,80 +1,10 @@
-:root {
-    --bg: #0a0a0a;
-    --text: #ffffff;
-    --cyan: #00ffcc;
-    --crimson: #ff2a5f;
+/* 3D Canvas Styling */
+#bg-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -2; /* Keeps the 3D behind the text and Luffy */
+    pointer-events: none;
 }
-
-body, html {
-    margin: 0;
-    padding: 0;
-    background-color: var(--bg);
-    color: var(--text);
-    font-family: 'Segoe UI', Roboto, sans-serif;
-    overflow-x: hidden;
-}
-
-/* Background Glows */
-.glow-1 {
-    position: fixed; top: -20%; left: -10%;
-    width: 50vw; height: 50vw;
-    background: radial-gradient(circle, rgba(0, 255, 204, 0.05) 0%, transparent 70%);
-    z-index: -1;
-}
-.glow-2 {
-    position: fixed; bottom: -20%; right: -10%;
-    width: 50vw; height: 50vw;
-    background: radial-gradient(circle, rgba(255, 42, 95, 0.05) 0%, transparent 70%);
-    z-index: -1;
-}
-
-/* Layout */
-section {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 10%;
-    opacity: 0;
-    transform: translateY(40px);
-    transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-section.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Typography & Hero */
-#hero { justify-content: space-between; gap: 50px; }
-.hero-content { flex: 1; z-index: 2; }
-h1 {
-    font-size: clamp(4rem, 8vw, 8rem);
-    font-weight: 900;
-    margin: 0;
-    background: linear-gradient(45deg, var(--text), #555);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-.subtitle { color: var(--cyan); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 30px;}
-
-/* Luffy Image */
-.hero-image {
-    flex: 1; height: 80vh;
-    background-image: url('https://w0.peakpx.com/wallpaper/746/845/HD-wallpaper-one-piece-luffy.jpg');
-    background-size: cover; background-position: center top;
-    -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
-    filter: grayscale(20%) contrast(120%);
-}
-
-/* Tools Grid */
-.skills-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px; width: 100%; max-width: 900px;
-}
-.badge {
-    border: 1px solid rgba(255, 255, 255, 0.05); padding: 30px;
-    border-radius: 12px; text-align: center;
-    transition: all 0.3s ease;
-}
-.badge:hover { border-color: var(--crimson); background: rgba(255, 42, 95, 0.05); transform: translateY(-5px); }
