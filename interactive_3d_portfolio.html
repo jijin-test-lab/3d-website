@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Interactive Portfolio</title>
+    
+    <!-- Tailwind CSS for styling the UI overlay -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Three.js for 3D rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- Google Fonts for modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base reset to ensure full screen canvas */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #030305; /* Deep dark background */
+            font-family: 'Inter', sans-serif;
+            touch-action: none; /* Prevent scroll on mobile while interacting */
+        }
+        
+        /* The canvas container */
+        #webgl-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* The UI overlay layer */
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none; /* Allows mouse events to pass through to the 3D canvas */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, transparent 0%, rgba(3,3,5,0.6) 100%);
+        }
+
+        /* Subtle glowing text effect */
+        .glow-text {
+            text-shadow: 0 0 20px rgba(139, 92, 246, 0.5), 0 0 40px rgba(56, 189, 248, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 3D Canvas Background -->
+    <div id="webgl-container"></div>
+
+    <!-- UI Foreground -->
+    <div id="ui-layer">
+        <h1 class="text-white text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter uppercase text-center glow-text leading-tight mix-blend-screen">
+            My Interactive <br />
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600">Portfolio</span>
+        </h1>
+        <p class="mt-6 text-gray-400 tracking-[0.3em] uppercase text-xs md:text-sm font-light">
+            jijin-test-lab
+        </p>
+    </div>
+
+    <script>
+        // Ensure script runs after the window loads
+        window.onload = function() {
+            initThreeJS();
+        };
+
+        function initThreeJS() {
+            const container = document.getElementById('webgl-container');
+
+            // 1. Scene Setup
+            const scene = new THREE.Scene();
+            
+            // Add a very subtle dark fog to blend particles into the background depth
+            scene.fog = new THREE.FogExp2(0x030305, 0.001);
+
+            // 2. Camera Setup
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+            camera.position.z = 400;
+
+            // 3. Renderer Setup
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Optimize for high DPI displays without killing performance
+            container.appendChild(renderer.domElement);
+
+            // 4. Create Swirling Particle Systems (Fiber Optic Dust)
+            // We will create multiple groups to give a complex, multi-layered swirling effect
+            const particleGroup = new THREE.Group();
+            scene.add(particleGroup);
+
+            // Function to generate a ring of particles
+            function createParticleRing(particleCount, radius, colorHex, size) {
+                const geometry = new THREE.BufferGeometry();
+                const posArray = new Float32Array(particleCount * 3);
+
+                for (let i = 0; i < particleCount * 3; i += 3) {
+                    // Create points in a torus/donut shape
+                    const theta = Math.random() * Math.PI * 2; // Angle around the ring
+                    const phi = Math.random() * Math.PI * 2;   // Angle of the tube
+                    
+                    // Tube thickness
+                    const tubeRadius = Math.random() * 80;
+
+                    // Calculate 3D coordinates
+                    const x = (radius + tubeRadius * Math.cos(phi)) * Math.cos(theta);
+                    const y = (radius + tubeRadius * Math.cos(phi)) * Math.sin(theta);
+                    const z = tubeRadius * Math.sin(phi);
+
+                    // Add some random scatter for a more organic look
+                    posArray[i] = x + (Math.random() - 0.5) * 50;
+                    posArray[i+1] = y + (Math.random() - 0.5) * 50;
+                    posArray[i+2] = z + (Math.random() - 0.5) * 50;
+                }
+
+                geometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+                // Glowing material using Additive Blending
+                const material = new THREE.PointsMaterial({
+                    size: size,
+                    color: colorHex,
+                    transparent: true,
+                    opacity: 0.8,
+                    blending: THREE.AdditiveBlending, // This makes the particles glow when they overlap
+                    depthWrite: false // Prevents weird clipping artifacts
+                });
+
+                return new THREE.Points(geometry, material);
+            }
+
+            // Create three distinct rings to form a complex swirl
+            const ring1 = createParticleRing(5000, 150, 0x00f0ff, 1.5); // Cyan
+            const ring2 = createParticleRing(5000, 220, 0x8a2be2, 1.2); // Purple
+            const ring3 = createParticleRing(4000, 300, 0x4169e1, 2.0); // Royal Blue
+
+            // Tilt the rings differently for a 3D volume feel
+            ring1.rotation.x = Math.PI / 4;
+            ring2.rotation.y = Math.PI / 3;
+            ring3.rotation.z = Math.PI / 6;
+
+            particleGroup.add(ring1);
+            particleGroup.add(ring2);
+            particleGroup.add(ring3);
+
+            // 5. Add a background field of "stars" or static dust for depth
+            const bgGeometry = new THREE.BufferGeometry();
+            const bgCount = 3000;
+            const bgPosArray = new Float32Array(bgCount * 3);
+            for(let i = 0; i < bgCount * 3; i++) {
+                bgPosArray[i] = (Math.random() - 0.5) * 2000;
+            }
+            bgGeometry.setAttribute('position', new THREE.BufferAttribute(bgPosArray, 3));
+            const bgMaterial = new THREE.PointsMaterial({
+                size: 1,
+                color: 0x555577,
+                transparent: true,
+                opacity: 0.4
+            });
+            const bgParticles = new THREE.Points(bgGeometry, bgMaterial);
+            scene.add(bgParticles);
+
+            // 6. Interaction Variables (Mouse / Touch)
+            let mouseX = 0;
+            let mouseY = 0;
+            let targetX = 0;
+            let targetY = 0;
+
+            const windowHalfX = window.innerWidth / 2;
+            const windowHalfY = window.innerHeight / 2;
+
+            // Track mouse movements
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX - windowHalfX);
+                mouseY = (event.clientY - windowHalfY);
+            });
+
+            // Track touch movements for mobile users
+            document.addEventListener('touchmove', (event) => {
+                if(event.touches.length > 0) {
+                    mouseX = (event.touches[0].clientX - windowHalfX);
+                    mouseY = (event.touches[0].clientY - windowHalfY);
+                }
+            }, { passive: false });
+
+            // 7. Handle Window Resizing
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            // 8. Animation Loop
+            const clock = new THREE.Clock();
+
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                const elapsedTime = clock.getElapsedTime();
+
+                // Calculate target rotation based on mouse position (normalized)
+                // This creates the reactive 3D parallax effect
+                targetX = mouseX * 0.001;
+                targetY = mouseY * 0.001;
+
+                // Smoothly interpolate the group's rotation towards the target rotation (Lerp)
+                particleGroup.rotation.y += 0.05 * (targetX - particleGroup.rotation.y);
+                particleGroup.rotation.x += 0.05 * (targetY - particleGroup.rotation.x);
+
+                // Add continuous, automatic swirling motion to the individual rings
+                ring1.rotation.z += 0.002;
+                ring2.rotation.z -= 0.0015;
+                ring3.rotation.x += 0.001;
+
+                // Slowly rotate the background for a feeling of drifting through space
+                bgParticles.rotation.y += 0.0002;
+
+                // Make the particles subtly breathe/pulse by moving the camera slightly on a sine wave
+                camera.position.z = 400 + Math.sin(elapsedTime * 0.5) * 30;
+
+                // Render the scene
+                renderer.render(scene, camera);
+            }
+
+            // Start the loop
+            animate();
+        }
+    </script>
+</body>
+</html>
