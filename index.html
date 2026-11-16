@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jijin | Cybersecurity</title>
-    <!-- This line connects your CSS file -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- The new 3D Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
     <div class="glow-1"></div>
     <div class="glow-2"></div>
 
@@ -20,7 +22,7 @@
     </section>
 
     <section id="about" style="text-align: center;">
-        <h2 style="font-size: 2.5rem; color: #ccc;">Security researcher specializing in <span style="color: white;">vulnerability assessments</span>.<br>Creator of SecuStack Analyzer.</h2>
+        <h2 style="font-size: 2.5rem; color: #ccc; max-width: 800px; margin: auto;">Security researcher specializing in <span style="color: white;">vulnerability assessments</span>.<br>Creator of SecuStack Analyzer.</h2>
     </section>
 
     <section id="skills" style="flex-direction: column;">
@@ -33,7 +35,8 @@
         </div>
     </section>
 
-    <!-- This line connects your JavaScript file -->
+    <!-- Load the 3D Library, then load your custom script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
