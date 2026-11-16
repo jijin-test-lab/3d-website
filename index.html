@@ -3,39 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jijin | Cybersecurity</title>
+    <title>Jijin | Cinematic Portfolio</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- The new 3D Canvas -->
+    <!-- The Cinematic 3D Canvas -->
     <canvas id="bg-canvas"></canvas>
 
-    <div class="glow-1"></div>
-    <div class="glow-2"></div>
+    <main>
+        <section id="hero">
+            <div class="content">
+                <div class="stage">01 / APPROACH</div>
+                <h1>Architecture,<br>held in winter light.</h1>
+                <p>Cybersecurity researcher and creator of SecuStack Analyzer.</p>
+            </div>
+        </section>
 
-    <section id="hero">
-        <div class="hero-content">
-            <h1>Jijin</h1>
-            <div class="subtitle">Web Application Security</div>
-        </div>
-        <div class="hero-image"></div>
-    </section>
+        <section id="reflection">
+            <div class="content right">
+                <div class="stage">02 / REFLECTION</div>
+                <h2>Mirrored at<br>the waterline.</h2>
+                <p>Specializing in vulnerability assessments, Nmap, and Burp Suite.</p>
+            </div>
+        </section>
 
-    <section id="about" style="text-align: center;">
-        <h2 style="font-size: 2.5rem; color: #ccc; max-width: 800px; margin: auto;">Security researcher specializing in <span style="color: white;">vulnerability assessments</span>.<br>Creator of SecuStack Analyzer.</h2>
-    </section>
+        <section id="layers">
+            <div class="content">
+                <div class="stage">03 / LAYERS</div>
+                <h2>Tier above tier,<br>in measured rhythm.</h2>
+                <p>Exploiting WebGoat, Juice Shop, and identifying critical web flaws.</p>
+            </div>
+        </section>
+        
+        <section id="contact">
+            <div class="content center">
+                <div class="stage">04 / CONTACT</div>
+                <h2>Explore the structure.</h2>
+                <a href="https://github.com/jijin-exe" class="btn">View GitHub</a>
+            </div>
+        </section>
+    </main>
 
-    <section id="skills" style="flex-direction: column;">
-        <div class="subtitle">Technical Arsenal</div>
-        <div class="skills-grid">
-            <div class="badge">Nmap</div>
-            <div class="badge">Burp Suite</div>
-            <div class="badge">OWASP WebGoat</div>
-            <div class="badge">Juice Shop</div>
-        </div>
-    </section>
-
-    <!-- Load the 3D Library, then load your custom script -->
+    <!-- Load Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="script.js"></script>
 </body>
