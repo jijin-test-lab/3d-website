@@ -3,97 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jijin's Wallpapers</title>
+    <title>OtakuCanvas</title>
     <style>
-        body {
-            background-color: #0a0a0a;
+        body, html {
+            margin: 0;
+            padding: 0;
+            background-color: #050914;
             color: white;
             font-family: 'Segoe UI', sans-serif;
-            margin: 0;
+            overflow-x: hidden;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+            display: block;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
             padding: 40px 10%;
+            min-height: 100vh;
         }
 
         h1 {
             text-align: center;
             font-size: 3rem;
             margin-bottom: 10px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
         }
 
         p {
             text-align: center;
-            color: #888;
+            color: #8a9bb3;
             margin-bottom: 50px;
         }
 
-        /* The Grid System */
+        /* --- THE UPGRADED GALLERY GRID --- */
         .gallery {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            gap: 30px;
         }
 
-        /* The Wallpaper Card */
+        /* MAGIC TRICK: Dim and blur all OTHER images when hovering over the gallery */
+        .gallery:hover .wallpaper-card:not(:hover) {
+            filter: brightness(0.3) grayscale(50%) blur(4px);
+            transform: scale(0.95);
+        }
+
         .wallpaper-card {
             position: relative;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
-            transition: transform 0.3s;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            z-index: 1; /* Default layer */
+            /* Smooth cinematic spring animation */
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
+        /* THE POP-UP EFFECT */
         .wallpaper-card:hover {
-            transform: scale(1.02);
+            transform: scale(1.30); /* Zooms the hovered picture up by 30% */
+            z-index: 100; /* Forces it to float above everything else */
+            border-color: rgba(0, 255, 204, 0.9);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 255, 204, 0.3);
         }
 
         .wallpaper-card img {
             width: 100%;
-            height: 400px;
+            height: 350px;
             object-fit: cover;
+            border-radius: 8px;
             display: block;
         }
 
-        /* The Download Button */
         .download-btn {
             position: absolute;
-            bottom: 20px;
-            right: 20px;
+            bottom: 25px;
+            right: 25px;
             background: rgba(0, 255, 204, 0.9);
             color: #000;
             padding: 10px 20px;
             text-decoration: none;
             font-weight: bold;
-            border-radius: 5px;
+            border-radius: 8px;
             opacity: 0; 
-            transition: opacity 0.3s;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
         }
 
         .wallpaper-card:hover .download-btn {
             opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
 <body>
 
-    <h1>Free HD Wallpapers</h1>
-    <p>Curated high-resolution backgrounds. Hover over an image to download.</p>
+    <canvas id="bg-canvas"></canvas>
 
-    <!-- The empty gallery container where images will appear -->
-    <div class="gallery" id="auto-gallery">
-        <!-- The JavaScript will inject all the images here automatically -->
+    <div class="content-wrapper">
+        <h1>Cinematic Archives</h1>
+        <p>Curated high-resolution backgrounds. Hover over an image to download.</p>
+
+        <div class="gallery" id="auto-gallery">
+            <!-- JavaScript injects images here -->
+        </div>
     </div>
 
-    <!-- The Automation Script -->
+    <!-- 1. Load Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- 2. Setup the 3D Interactive Background & Wallpaper Loader -->
     <script>
+        // --- 3D PARTICLE ENGINE ---
+        const canvas = document.getElementById('bg-canvas');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x050914, 0.002);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+        
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.position.z = 50;
+
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 1500;
+        const posArray = new Float32Array(particlesCount * 3);
+
+        for(let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 200; 
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+        const material = new THREE.PointsMaterial({
+            size: 0.2,
+            color: 0x00ffcc, 
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+
+        const particlesMesh = new THREE.Points(particlesGeometry, material);
+        scene.add(particlesMesh);
+
+        let mouseX = 0;
+        let mouseY = 0;
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth - 0.5) * 2;
+            mouseY = (event.clientY / window.innerHeight - 0.5) * 2;
+        });
+
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+
+            particlesMesh.rotation.y = elapsedTime * 0.05;
+            particlesMesh.rotation.x = elapsedTime * 0.02;
+
+            camera.position.x += (mouseX * 5 - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY * 5 - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- AUTOMATIC WALLPAPER LOADER ---
         async function loadWallpapers() {
             const gallery = document.getElementById('auto-gallery');
             
             try {
-                // Asks GitHub for the list of files in your wallpapers folder
                 const response = await fetch('https://api.github.com/repos/jijin-test-lab/3d-website/contents/wallpapers');
                 const files = await response.json();
 
-                // Loop through every file it finds
                 files.forEach(file => {
-                    // Only load it if it's an image file (jpg, jpeg, png, gif)
                     if(file.name.match(/\.(jpe?g|png|gif)$/i)) {
                         gallery.innerHTML += `
                             <div class="wallpaper-card">
@@ -105,13 +208,11 @@
                 });
             } catch (error) {
                 console.error("Error loading wallpapers:", error);
-                gallery.innerHTML = "<p style='text-align: center;'>Error loading wallpapers. Make sure the 'wallpapers' folder exists and has images!</p>";
+                gallery.innerHTML = "<p style='text-align: center; grid-column: 1/-1;'>Error loading wallpapers. Check if the 'wallpapers' folder exists.</p>";
             }
         }
 
-        // Run the function
         loadWallpapers();
     </script>
-
 </body>
 </html>
