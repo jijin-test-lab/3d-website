@@ -28,7 +28,6 @@
         /* The Grid System */
         .gallery {
             display: grid;
-            /* This automatically creates columns that fit the screen size */
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
         }
@@ -42,13 +41,13 @@
         }
 
         .wallpaper-card:hover {
-            transform: scale(1.02); /* Slight zoom when hovering */
+            transform: scale(1.02);
         }
 
         .wallpaper-card img {
             width: 100%;
             height: 400px;
-            object-fit: cover; /* Keeps images from looking stretched */
+            object-fit: cover;
             display: block;
         }
 
@@ -63,11 +62,10 @@
             text-decoration: none;
             font-weight: bold;
             border-radius: 5px;
-            opacity: 0; /* Hidden by default */
+            opacity: 0; 
             transition: opacity 0.3s;
         }
 
-        /* Show the download button only when hovering over the image */
         .wallpaper-card:hover .download-btn {
             opacity: 1;
         }
@@ -78,22 +76,42 @@
     <h1>Free HD Wallpapers</h1>
     <p>Curated high-resolution backgrounds. Hover over an image to download.</p>
 
-   <div class="gallery" id="auto-gallery">
+    <!-- The empty gallery container where images will appear -->
+    <div class="gallery" id="auto-gallery">
         <!-- The JavaScript will inject all the images here automatically -->
     </div>
-        <!-- Wallpaper Item 2 -->
-        <div class="wallpaper-card">
-            <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=600" alt="Cyberpunk City">
-            <a href="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2560" download class="download-btn">Download 4K</a>
-        </div>
 
-        <!-- Wallpaper Item 3 -->
-        <div class="wallpaper-card">
-            <img src="https://images.unsplash.com/photo-1531306728370-e2ebd9d7bb99?q=80&w=600" alt="Space Galaxy">
-            <a href="https://images.unsplash.com/photo-1531306728370-e2ebd9d7bb99?q=80&w=2560" download class="download-btn">Download 4K</a>
-        </div>
+    <!-- The Automation Script -->
+    <script>
+        async function loadWallpapers() {
+            const gallery = document.getElementById('auto-gallery');
+            
+            try {
+                // Asks GitHub for the list of files in your wallpapers folder
+                const response = await fetch('https://api.github.com/repos/jijin-test-lab/3d-website/contents/wallpapers');
+                const files = await response.json();
 
-    </div>
+                // Loop through every file it finds
+                files.forEach(file => {
+                    // Only load it if it's an image file (jpg, jpeg, png, gif)
+                    if(file.name.match(/\.(jpe?g|png|gif)$/i)) {
+                        gallery.innerHTML += `
+                            <div class="wallpaper-card">
+                                <img src="wallpapers/${file.name}" alt="${file.name}">
+                                <a href="wallpapers/${file.name}" download class="download-btn">Download</a>
+                            </div>
+                        `;
+                    }
+                });
+            } catch (error) {
+                console.error("Error loading wallpapers:", error);
+                gallery.innerHTML = "<p style='text-align: center;'>Error loading wallpapers. Make sure the 'wallpapers' folder exists and has images!</p>";
+            }
+        }
+
+        // Run the function
+        loadWallpapers();
+    </script>
 
 </body>
 </html>
